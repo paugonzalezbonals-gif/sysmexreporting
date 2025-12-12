@@ -1,0 +1,3866 @@
+<script>
+// Sidebar toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  var sidebar = document.getElementById('sidebar');
+  var main = document.getElementById('main');
+  var btn = document.getElementById('sidebarToggleBtn');
+  if(btn) {
+    btn.addEventListener('click', function() {
+      document.body.classList.toggle('sidebar-hidden');
+      btn.innerText = document.body.classList.contains('sidebar-hidden') ? '⮞' : '⮜';
+    });
+  }
+});
+</script>
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel CSC</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    /* ============================================================= */
+/* GLOBAL STYLES */
+/* ============================================================= */
+
+
+:root {
+  --bg: #f7fafd;
+  --card: #fff;
+  --text: #23272f;
+      // Set canvas to always be square for perfect circle
+      const chartGroupsCanvas = document.getElementById('chartGroups');
+      if (chartGroupsCanvas) {
+        chartGroupsCanvas.style.width = '100%';
+        chartGroupsCanvas.style.height = 'auto';
+        chartGroupsCanvas.style.aspectRatio = '1 / 1';
+        chartGroupsCanvas.height = chartGroupsCanvas.width;
+      }
+  --text-soft: #6b7280;
+  --primary: #1f8ac0;
+  --primary-2: #4db27a;
+  --accent: linear-gradient(90deg,var(--primary),var(--primary-2));
+  --border: #e5e7eb;
+  --shadow: 0 8px 32px rgba(31,138,192,0.07);
+  --sidebar-bg: #1f2937;
+  --sidebar-text: #fff;
+  --sidebar-active: #e0f2fe;
+}
+
+body.dark {
+  /* dark mode: keep monochrome inversed */
+  --bg: #000000;
+  --card: #0f0f0f;
+  --text: #ffffff;
+  --text-soft: #bdbdbd;
+  --primary: #1f8ac0;
+  --primary-dark: #2a7fa8;
+  --border: rgba(255,255,255,0.06);
+  --shadow: 0 4px 16px rgba(255,255,255,0.02);
+  --sidebar-bg: #000000;
+  --sidebar-text: #ffffff;
+  --sidebar-active: rgba(255,255,255,0.06);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  margin: 0 16px 0 16px;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
+
+/* Sidebar hide for large screens */
+body.sidebar-hidden #sidebar { transform: translateX(-100%); }
+body.sidebar-hidden #main { margin-left: 0; width: 100%; }
+
+/* ============================================================= */
+/* SIDEBAR */
+/* ============================================================= */
+
+#sidebar {
+  width: 240px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  padding-top: 24px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 2px 0 16px rgba(31,41,55,0.08);
+  gap: 8px;
+  z-index: 100;
+}
+
+.sidebar-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 22px 0 16px 0;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(31,138,192,0.08);
+  margin: 0 18px 22px 18px;
+}
+
+.sidebar-btn {
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  color: var(--sidebar-text);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  width: 100%;
+  margin: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-btn:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.sidebar-btn {
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  color: var(--sidebar-text);
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  margin: 4px 10px;
+  border-radius: 10px;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.2px;
+}
+.sidebar-btn:hover, .sidebar-btn.active {
+  background: var(--sidebar-active);
+  color: var(--primary);
+}
+  /* SIDEBAR TOGGLE BUTTON */
+  #sidebarToggleBtn {
+    position: absolute;
+    top: 18px;
+    right: -22px;
+    width: 38px;
+    height: 38px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(31,41,55,0.10);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 200;
+    font-size: 1.3rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  #sidebarToggleBtn:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+  to {
+    width: 4px;
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* ============================================================= */
+/* MAIN AREA */
+/* ============================================================= */
+
+#main {
+  margin-left: 220px;
+  width: calc(100% - 220px);
+  padding: 0 24px 40px 24px;
+  display: block;
+  min-height: 100vh;
+}
+
+/* ============================================================= */
+/* TOP BAR */
+/* ============================================================= */
+
+#topbar {
+  background: var(--card);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  top: 0;
+  z-index: 20;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.topbar-left{display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:28px}
+.brand .logo{width:36px;height:36px;border-radius:8px;background:var(--primary);display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700}
+.brand .logo img.company-logo{
+  width:90px;
+  height:90px;
+  border-radius:16px;
+  object-fit:contain;
+  display:block;
+  background:white;
+  padding:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.menu-toggle{display:none;background:none;border:none;font-size:20px;padding:8px;border-radius:8px;cursor:pointer}
+
+#loadExcelBtn {
+  background: linear-gradient(135deg, var(--primary), #2da3d5);
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(31,138,192,0.3);
+}
+
+#loadExcelBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31,138,192,0.4);
+}
+
+#toggleDark,
+#exportPdf {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--primary-dark);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+#toggleDark:hover,
+#exportPdf:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* ============================================================= */
+/* FILTER BAR */
+/* ============================================================= */
+
+#filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  clear: both;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.filter-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-block label {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 3px;
+}
+
+.filter-block input,
+.filter-block select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  min-width: 140px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.filter-block input:focus,
+.filter-block select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31,138,192,0.1);
+}
+
+#applyFilters,
+#clearFilters {
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+#applyFilters:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31,138,192,0.4);
+}
+
+#clearFilters {
+  background: #6b7280;
+}
+
+#clearFilters:hover {
+  background: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ============================================================= */
+/* SECTIONS */
+/* ============================================================= */
+
+.section {
+  display: none;
+  padding: 20px 0;
+  width: 100%;
+  clear: both;
+}
+
+.section.active {
+  display: block;
+}
+
+/* ============================================================= */
+/* KPI GRID */
+/* ============================================================= */
+
+#kpiGrid {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  /* Make KPI cards visually identical to chart boxes */
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(15,23,36,0.06);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15,23,36,0.12);
+}
+
+.kpi-label {
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.kpi-value {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.kpi-subcard {
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(31,138,192,0.04);
+  padding: 18px 22px 14px 22px;
+  min-width: 170px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  transition: box-shadow 0.2s;
+}
+.kpi-subcard:hover {
+  box-shadow: 0 6px 18px rgba(31,138,192,0.10);
+  border-color: var(--primary);
+}
+
+/* ============================================================= */
+/* CHARTS */
+/* ============================================================= */
+
+#dashboardCharts {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  #dashboardCharts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  #dashboardCharts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================= */
+
+.chart-box {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(15,23,36,0.06);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-box h3 {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.chart-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15,23,36,0.12);
+}
+
+.chart-box.wide {
+  grid-column: span 3;
+}
+
+/* RESPONSIVE CHART CANVAS */
+.chart-box canvas {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  min-height: 240px;
+}
+
+/* Ensure chart containers keep reasonable height on small screens to avoid "squashed" charts */
+.chart-box { min-height: 180px; }
+.chart-box .chart-wrap { width: 100%; height: 100%; }
+
+/* expand button for charts */
+.chart-box .expand-btn {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* modal for expanded chart */
+.chart-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 10000;
+}
+.chart-modal.active { display: flex; }
+.chart-modal .modal-card { background: var(--card); padding: 18px; border-radius: 12px; max-width: 90%; max-height: 90%; overflow: auto; }
+.chart-modal img { width: 100%; height: auto; display: block; }
+.chart-modal .modal-close { position: absolute; right: 20px; top: 16px; background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; }
+
+/* SPLASH / INTRO STYLES */
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 1200ms ease, visibility 1200ms ease;
+}
+.splash-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-card {
+  background: var(--card);
+  padding: 36px 40px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  max-width: 520px;
+.splash-card {
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform 1200ms cubic-bezier(0.22,1,0.36,1);
+}
+.splash-card.animate { transform: translateY(-4px); }
+.splash-card h1 { margin: 0 0 8px 0; font-size: 22px; }
+
+/* staggered items */
+  .splash-item { opacity: 1; transform: none; display: inline-block; transition: none; }
+.splash-card .splash-item:nth-of-type(1) { transition-delay: 120ms; }
+.splash-card .splash-item:nth-of-type(2) { transition-delay: 240ms; }
+.splash-card .splash-item:nth-of-type(3) { transition-delay: 360ms; }
+.btn-primary { background: #000000; color: #ffffff; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+
+/* ============================================================= */
+/* HEATMAP */
+/* ============================================================= */
+
+/* ============================================================= */
+/* CREATORS */
+/* ============================================================= */
+/* ============================================================= */
+
+#section-heatmap {
+  clear: both;
+  width: 100%;
+}
+
+#heatmapContainer {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(15,23,36,0.06);
+  margin-top: 20px;
+  width: 100%;
+  overflow-x: auto;
+  transition: all 0.3s ease;
+}
+
+/* ============================================================= */
+/* TABLE */
+/* ============================================================= */
+
+#casesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#casesTable thead {
+  background: linear-gradient(90deg, var(--primary), #2da3d5);
+  color: white;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+#casesTable th,
+#casesTable td {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+#casesTable tbody tr {
+  transition: all 0.2s ease;
+}
+
+#casesTable tbody tr:hover {
+  background: var(--primary);
+  background: rgba(31,138,192,0.08);
+  transform: scale(1.01);
+  box-shadow: inset 0 0 12px rgba(31,138,192,0.1);
+}
+
+#casesTable tr:nth-child(even) {
+  background: var(--bg);
+}
+
+#tableSearch {
+  padding: 10px 14px;
+  padding-left: 36px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>');
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+  color: var(--text);
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+#tableSearch:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31,138,192,0.1);
+}
+
+/* Pagination */
+#tablePagination {
+  margin-top: 24px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 8px 12px;
+  background: var(--card);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  min-width: 40px;
+}
+
+.page-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31,138,192,0.3);
+}
+
+.page-btn:first-child::before {
+  content: '← ';
+  margin-right: 4px;
+}
+
+.page-btn:last-child::after {
+  content: ' →';
+  margin-left: 4px;
+}
+
+/* ============================================================= */
+/* COMPARE SECTION */
+/* ============================================================= */
+
+#compareFilters {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+#compareFilters input {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+#compareFilters input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31,138,192,0.1);
+}
+
+#compareRun {
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), #2da3d5);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  align-self: flex-end;
+}
+
+#compareRun:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31,138,192,0.4);
+}
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.compare-wrap {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.compare-panel input { width: 100%; }
+
+
+.cmp-card {
+  background: linear-gradient(135deg, var(--card), rgba(31,138,192,0.05));
+  padding: 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.cmp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(31,138,192,0.12);
+  border-color: var(--primary);
+}
+
+.cmp-card h4 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.cmp-card div {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 8px;
+}
+
+/* ============================================================= */
+/* RESPONSIVE */
+/* ============================================================= */
+
+@media (max-width: 1200px) {
+  #dashboardCharts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .chart-box.wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .compare-wrap { grid-template-columns: 1fr; }
+  .cmp-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+  #sidebar { transform: translateX(-100%); position: fixed; z-index: 30; }
+  body.sidebar-open #sidebar { transform: translateX(0); }
+  .menu-toggle{display:inline-block}
+  #main{margin-left:0;width:100%;padding:0 16px 40px 16px}
+  #topbar{border-radius:8px}
+  #kpiGrid{grid-template-columns:repeat(2,1fr)}
+  #dashboardCharts{grid-template-columns:1fr}
+  .chart-box.wide{grid-column:span 1}
+}
+
+@media (max-width: 600px) {
+  #kpiGrid{
+    grid-template-columns: 1fr;
+  }
+  
+  .cmp-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  #compareFilters {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .filter-block {
+    width: 100%;
+  }
+  
+  .filter-block input,
+  .filter-block select {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+#reportContainer {
+  background: var(--card);
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.report-card {
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.report-card h4 {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.report-card div {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.report-block {
+  margin-top: 35px;
+}
+
+.report-block table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.report-block th,
+.report-block td {
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+
+.report-block th {
+  background: var(--primary);
+  color: white;
+}
+
+#exportReportPdf {
+  margin-top: 30px;
+  padding: 10px 18px;
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+
+  
+    /* Small screens: allow toggling sidebar */
+    @media (max-width: 900px) {
+      #sidebar { transform: translateX(-100%); position: fixed; z-index: 30; }
+      body.sidebar-open #sidebar { transform: translateX(0); }
+      .menu-toggle{display:inline-block}
+      #main{margin-left:0;width:100%}
+      #topbar{border-radius:0}
+      #kpiGrid{grid-template-columns:repeat(2,1fr)}
+    }
+
+  </style>
+
+  
+</head>
+<body>
+  <!-- SPLASH / INTRO OVERLAY -->
+  <div id="splashOverlay" class="splash-overlay">
+    <div class="splash-card" style="display:flex;flex-direction:column;align-items:center;">
+        <img src="Sysmex_company_logo.svg.png" alt="Sysmex logo" style="width:170px;height:170px;border-radius:22px;background:white;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,0.13);margin-bottom:22px;object-fit:contain;display:block;" />
+        <h1 class="splash-item">CSC REPORTING WEB</h1>
+        <p class="splash-item" style="color:var(--text-soft);margin-top:6px">Tu panel de análisis de casos</p>
+        <div style="height:18px"></div>
+        <button id="enterBtn" class="btn-primary splash-item">Entrar</button>
+      </div>
+  </div>
+
+  <!-- Chart modal (for expand) -->
+  <div id="chartModal" class="chart-modal" aria-hidden="true">
+    <div class="modal-card">
+      <button id="chartModalClose" class="modal-close">✕</button>
+      <img id="chartModalImg" src="" alt="Chart view" />
+    </div>
+  </div>
+
+  <!-- STYLES -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- LIBRARIES -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- SETTINGS STYLES -->
+  <style>
+/* ============================================================= */
+/* SETTINGS PAGE */
+/* ============================================================= */
+
+#settingsContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+}
+
+.settings-card {
+  background: var(--card);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(15,23,36,0.06);
+  transition: all 0.3s ease;
+}
+
+.settings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15,23,36,0.12);
+}
+
+.settings-card-header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.settings-card-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settings-description {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.setting-label {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.settings-select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  min-width: 140px;
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31,138,192,0.1);
+}
+
+.settings-select:hover {
+  border-color: var(--primary);
+}
+
+/* TOGGLE SWITCH */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: all 0.3s ease;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
+
+.toggle-input:checked + .toggle-slider {
+  background-color: var(--primary);
+}
+
+.toggle-input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}
+
+/* BOTONES DE CONFIGURACIÓN */
+.settings-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.settings-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.settings-btn-primary {
+  background: linear-gradient(135deg, var(--primary), #2da3d5);
+  color: white;
+}
+
+.settings-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31,138,192,0.4);
+}
+
+.settings-btn-secondary {
+  background: var(--bg);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+.settings-btn-secondary:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.settings-btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.settings-btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239,68,68,0.4);
+}
+
+/* INFO SECTION */
+.settings-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.info-label {
+  font-size: 13px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+/* COLOR PALETTE */
+.color-palette {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+}
+
+.color-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.color-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31,138,192,0.3);
+}
+
+.prof-toggle-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+}
+.prof-toggle-btn.active { background: var(--primary); color: white; border-color: transparent }
+
+/* PROFESSIONALS CARDS */
+.prof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.prof-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.prof-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.08); }
+.prof-avatar { width:64px; height:64px; border-radius:12px; display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;flex-shrink:0 }
+.prof-info { flex:1; display:flex;flex-direction:column;gap:6px }
+.prof-name { font-weight:700; font-size:16px }
+.prof-metrics { display:flex; gap:12px; align-items:center }
+.prof-metric { display:flex; flex-direction:column }
+.prof-metric .label { font-size:12px; color:var(--text-soft) }
+.prof-metric .value { font-size:18px; font-weight:800; color:var(--primary) }
+.prof-bars { width:140px; height:10px; background:rgba(0,0,0,0.05); border-radius:6px; overflow:hidden }
+.prof-bars .bar-created { height:100%; background:var(--primary); float:left }
+.prof-bars .bar-owned { height:100%; background:var(--primary-2); float:right }
+
+@media (max-width: 1200px) {
+  .prof-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .prof-grid { grid-template-columns: 1fr; }
+}
+
+/* RESPONSIVE SETTINGS */
+@media (max-width: 900px) {
+  #settingsContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-actions {
+    flex-direction: column;
+  }
+  
+  .settings-btn {
+    width: 100%;
+  }
+}
+  </style>
+
+      <!-- =========================
+     REPORT SECTION
+========================= -->
+
+<div id="section-report" class="section">
+  <div id="reportContainer">
+
+    <h2>Informe de Casos</h2>
+    <div id="reportDate"></div>
+
+    <div class="report-grid">
+      <div class="report-card">
+        <h4>Total de casos</h4>
+        <div id="rTotal"></div>
+      </div>
+
+      <div class="report-card">
+        <h4>Trucades aproximades</h4>
+        <div id="rCalls"></div>
+      </div>
+
+      <div class="report-card">
+        <h4>Mitjana de casos per dia</h4>
+        <div id="rAvg"></div>
+      </div>
+
+      <div class="report-card">
+        <h4>Dia amb més casos</h4>
+        <div id="rMaxDay"></div>
+      </div>
+    </div>
+
+    <div class="report-block">
+      <h3>Casos per tipus de dia</h3>
+      <table id="weekdayTable"></table>
+    </div>
+
+    <div class="report-block">
+      <h3>Casos per categoria d'equip</h3>
+      <table id="teamTable"></table>
+    </div>
+
+    <div class="report-block">
+      <h3>Casos per cua</h3>
+      <table id="queueTable"></table>
+    </div>
+
+    <button id="exportReportPdf">Exportar informe a PDF</button>
+
+  </div>
+</div>
+
+<!-- LIBRERIA PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <button id="sidebarToggleBtn" title="Ocultar barra lateral">⮜</button>
+    <div class="sidebar-title" style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <img src="Sysmex_company_logo.svg.png" alt="Sysmex logo" style="width:100px;height:100px;border-radius:14px;background:white;padding:8px;box-shadow:0 2px 8px rgba(0,0,0,0.10);margin-bottom:0;object-fit:contain;display:block;" />
+      <span style="font-size:22px;font-weight:800;color:#1f8ac0;letter-spacing:0.5px;">Panel CSC</span>
+    </div>
+    <button class="sidebar-btn" data-section="home">Inicio</button>
+    <button class="sidebar-btn" data-section="general">General</button>
+    <button class="sidebar-btn" data-section="heatmap">Mapa de Calor</button>
+    <button class="sidebar-btn" data-section="client">Cliente</button>
+    <button class="sidebar-btn" data-section="professionals">Profesionales</button>
+    <button class="sidebar-btn" data-section="settings">Configuración</button>
+  </div>
+
+  <div id="main">
+
+    <!-- TOP BAR -->
+    <div id="topbar">
+      <div class="topbar-left">
+        <button id="menuToggle" class="menu-toggle" aria-label="Abrir menú">☰</button>
+        <button id="sidebarToggle" class="menu-toggle" aria-label="Ocultar/mostrar barra">⇄</button>
+        <div class="brand">
+          <div>
+            <div style="font-weight:700">Panel CSC</div>
+            <div style="font-size:12px;color:var(--text-soft)">Análisis de casos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="toggleDark" title="Cambiar tema">🌙</button>
+        <button id="exportPdf" title="Exportar PDF">📄</button>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div id="filterBar">
+      <div class="filter-block">
+        <label>Desde</label>
+        <input type="date" id="filterDateFrom" />
+      </div>
+
+      <div class="filter-block">
+        <label>Hasta</label>
+        <input type="date" id="filterDateTo" />
+      </div>
+
+      <div class="filter-block">
+        <label>Equipo</label>
+        <select id="filterEquipment">
+          <option value="ALL">Todos</option>
+          <option value="HUM">HUM</option>
+          <option value="URI">URI</option>
+          <option value="OSNA">OSNA</option>
+          <option value="OTHERS">OTROS</option>
+        </select>
+      </div>
+
+      <div class="filter-block">
+        <label>Cola</label>
+        <select id="filterQueue">
+          <option value="ALL">Todos</option>
+          <option value="SES">SES</option>
+          <option value="SPT">SPT</option>
+        </select>
+      </div>
+
+      <div class="filter-block">
+        <label>Horario</label>
+        <select id="filterHours">
+          <option value="ALL">Todos</option>
+          <option value="WORKING">Horario laboral</option>
+          <option value="OFF">Fuera de horario</option>
+        </select>
+      </div>
+
+      <!-- Cliente search removed per user request -->
+
+      <!-- NEW HOSPITAL FILTER -->
+      <div class="filter-block">
+        <label>Hospital</label>
+        <select id="filterHospital">
+          <option value="ALL">Todos</option>
+        </select>
+      </div>
+
+      <button id="applyFilters">Aplicar</button>
+      <button id="clearFilters">Limpiar</button>
+    </div>
+    <!-- HOME / UPLOAD SECTION -->
+    <section id="section-home" class="section">
+      <div class="chart-box" style="max-width:760px;margin:0 auto;text-align:center">
+        <h3>Sube tu Excel</h3>
+        <p style="color:var(--text-soft);margin-bottom:12px">Arrastra o selecciona el archivo .xlsx para comenzar el análisis.</p>
+        <label for="fileInput" id="loadExcelBtn" style="font-size:1.2rem;display:inline-block;padding:18px 36px;background:linear-gradient(135deg,#1f8ac0,#4db27a);color:white;border-radius:12px;box-shadow:0 2px 12px rgba(31,138,192,0.10);font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;">
+          📁 Cargar Excel
+        </label>
+        <input id="fileInput" type="file" accept=".xlsx" style="display:none" />
+      </div>
+    </section>
+
+    <!-- DASHBOARD SECTION -->
+    <section id="section-general" class="section active">
+
+      <div id="kpiGrid">
+        <div class="kpi-card chart-box" style="width:100%;display:flex;flex-direction:column;gap:12px">
+          <div style="display: flex; flex-wrap: wrap; gap: 24px 32px; justify-content: center; align-items: stretch; width: 100%;">
+            <div class="kpi-subcard">
+              <div class="kpi-label">Total Casos CSC</div>
+              <div class="kpi-value" id="kpiTotal">-</div>
+            </div>
+            <div class="kpi-subcard">
+              <div class="kpi-label">Nº aprox. de llamadas</div>
+              <div class="kpi-value" id="kpiCalls">-</div>
+            </div>
+            <div class="kpi-subcard">
+              <div class="kpi-label">Fuera de horario</div>
+              <div class="kpi-value" id="kpiOff">-</div>
+            </div>
+                        <div class="kpi-subcard">
+                          <div class="kpi-label">Media diaria</div>
+                          <div class="kpi-value" id="kpiAvgDaily">-</div>
+                        </div>
+                        <div class="kpi-subcard">
+                          <div class="kpi-label">Día con más casos</div>
+                          <div class="kpi-value" id="kpiDayMost">-</div>
+                        </div>
+                        <div class="kpi-subcard">
+                          <div class="kpi-label">Cliente con más casos</div>
+                          <div class="kpi-value" id="kpiTopClient">-</div>
+                        </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+
+      <div id="dashboardCharts">
+        <div class="chart-box">
+          <h3>Casos Diarios</h3>
+          <canvas id="chartDaily"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h3>Grupos de Equipos</h3>
+          <canvas id="chartGroups" style="aspect-ratio:1/1;width:100%;height:auto;max-width:350px;display:block;margin:0 auto;"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h3></h3>
+          <div id="sesSptCards" class="ses-spt-cards-responsive">
+            <style>
+            .ses-spt-cards-responsive {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              grid-template-rows: repeat(2, 1fr);
+              gap: 16px;
+              justify-items: center;
+              align-items: center;
+              margin-top: 18px;
+              max-width: 420px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            .ses-spt-card {
+              width: 170px;
+              height: 90px;
+              background: var(--card);
+              border-radius: 14px;
+              box-shadow: var(--shadow);
+              padding: 12px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              border: 1px solid var(--border);
+            }
+            @media (max-width: 600px) {
+              .ses-spt-cards-responsive {
+                grid-template-columns: 1fr;
+                grid-template-rows: none;
+                max-width: 220px;
+              }
+              .ses-spt-card {
+                width: 100%;
+                min-width: 0;
+                height: 80px;
+                padding: 10px;
+              }
+            }
+            </style>
+            <div class="ses-spt-card" style="width: 170px; height: 90px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border);">
+              <div style="font-size: 15px; font-weight: 600; color: #1976d2; margin-bottom: 4px;">SES %</div>
+              <div id="sesPercent" style="font-size: 1.5rem; font-weight: 700; color: #111;">--%</div>
+            </div>
+            <div class="ses-spt-card" style="width: 170px; height: 90px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border);">
+              <div style="font-size: 15px; font-weight: 600; color: #43a047; margin-bottom: 4px;">SPT %</div>
+              <div id="sptPercent" style="font-size: 1.5rem; font-weight: 700; color: #111;">--%</div>
+            </div>
+            <div class="ses-spt-card" style="width: 170px; height: 90px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border);">
+              <div style="font-size: 15px; font-weight: 600; color: #1976d2; margin-bottom: 4px;">Total SES</div>
+              <div id="kpiSes" style="font-size: 1.5rem; font-weight: 700; color: #111;">-</div>
+            </div>
+            <div class="ses-spt-card" style="width: 170px; height: 90px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border);">
+              <div style="font-size: 15px; font-weight: 600; color: #43a047; margin-bottom: 4px;">Total SPT</div>
+              <div id="kpiSpt" style="font-size: 1.5rem; font-weight: 700; color: #111;">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <h3>Distribución de Colas</h3>
+          <canvas id="chartQueues"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h3>Horas Pico</h3>
+          <canvas id="chartPeakHours"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h3>Casos por Día de Semana</h3>
+          <canvas id="chartWeekday"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- HEATMAP SECTION -->
+    <section id="section-heatmap" class="section">
+      <h2>Mapa de Calor: Día × Hora</h2>
+      <div id="heatmapContainer"></div>
+    </section>
+
+    <!-- TABLE SECTION -->
+    <section id="section-table" class="section">
+      <h2>Tabla de Casos</h2>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center;">
+        <input type="text" id="tableSearch" placeholder="Buscar..." />
+        <button id="exportTableCsv" style="padding: 10px 16px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-weight: 500; transition: all 0.3s ease; font-size: 14px;">📥 CSV</button>
+        <button id="exportTablePdf" style="padding: 10px 16px; border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer; font-weight: 500; transition: all 0.3s ease; font-size: 14px;">📄 PDF</button>
+      </div>
+
+      <table id="casesTable">
+        <thead id="casesTableHead"></thead>
+        <tbody id="casesTableBody"></tbody>
+      </table>
+
+      <div id="tablePagination"></div>
+    </section>
+
+    <!-- COMPARE SECTION -->
+    <section id="section-compare" class="section">
+      <h2>Comparar Dos Períodos</h2>
+
+      <div class="compare-wrap">
+        <div id="compareFilters" class="compare-panel">
+          <div class="chart-box" style="padding:16px">
+            <h4 style="margin-top:0">Filtros</h4>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label>Período A Desde</label>
+              <input type="date" id="cmpAFrom" />
+              <label>Hasta</label>
+              <input type="date" id="cmpATo" />
+
+              <label>Período B Desde</label>
+              <input type="date" id="cmpBFrom" />
+              <label>Hasta</label>
+              <input type="date" id="cmpBTo" />
+            </div>
+            <div style="height:12px"></div>
+            <button id="compareRun">Comparar</button>
+          </div>
+        </div>
+
+        <div id="compareResult">
+          <div class="cmp-grid">
+            <div class="cmp-card">
+              <h4>Total A</h4>
+              <div id="cmpTotalA"></div>
+            </div>
+
+            <div class="cmp-card">
+              <h4>Total B</h4>
+              <div id="cmpTotalB"></div>
+            </div>
+
+            <div class="cmp-card">
+              <h4>Δ Total</h4>
+              <div id="cmpDeltaTotal"></div>
+            </div>
+
+            <div class="cmp-card">
+              <h4>SES A</h4>
+              <div id="cmpSesA"></div>
+            </div>
+
+            <div class="cmp-card">
+              <h4>SES B</h4>
+              <div id="cmpSesB"></div>
+            </div>
+
+            <div class="cmp-card">
+              <h4>Δ SES</h4>
+              <div id="cmpDeltaSes"></div>
+            </div>
+          </div>
+
+          <div class="chart-box wide">
+            <h3>Comparación Diaria</h3>
+            <canvas id="chartCompareDaily"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <!-- CLIENT placeholder section -->
+    <section id="section-client" class="section">
+      <h2>Cliente</h2>
+      <div id="clientContainer">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <div class="filter-block">
+            <label>Buscar Cliente</label>
+            <input type="text" id="clientSearch" placeholder="Escribir nombre..." />
+          </div>
+
+          <div class="filter-block">
+            <label>Cliente</label>
+            <select id="clientSelector"><option value="ALL">Todos</option></select>
+          </div>
+
+          <button id="clientApply" style="padding:10px 14px;border-radius:8px;background:var(--primary);color:white;border:none;cursor:pointer">Aplicar</button>
+        </div>
+
+        <div id="clientKpis" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px"></div>
+
+        <div class="chart-box">
+          <h3>Casos Diarios (Cliente)</h3>
+          <canvas id="chartClientDaily"></canvas>
+        </div>
+
+        <div id="clientEquipmentsContainer" style="margin-bottom:12px"></div>
+
+        <div class="chart-box">
+          <h3>Mapa de Calor (Cliente)</h3>
+          <div id="clientHeatmapContainer"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFESSIONALS placeholder section -->
+    <section id="section-professionals" class="section">
+      <h2>Profesionales</h2>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+        <button id="exportProfessionalsCsv" style="padding:8px 12px;border-radius:8px;background:var(--primary);color:white;border:none;cursor:pointer">📥 Exportar CSV</button>
+        <div style="flex:1"></div>
+      </div>
+
+      <div id="professionalsContainer">
+        <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+          <div style="background: var(--card); box-shadow: var(--shadow); border-radius: 14px; padding: 18px 22px; min-width: 260px; flex: 1; max-width: 350px;">
+            <h3 style="margin:0 0 10px 0; font-size: 1.1rem; color: var(--primary);">Top 3 Creadores</h3>
+            <div id="topCreatorsList" style="color:#111;"></div>
+          </div>
+          <div style="background: var(--card); box-shadow: var(--shadow); border-radius: 14px; padding: 18px 22px; min-width: 260px; flex: 1; max-width: 350px;">
+            <h3 style="margin:0 0 10px 0; font-size: 1.1rem; color: var(--primary-2);">Top 3 Owners</h3>
+            <div id="topOwnersList" style="color:#111;"></div>
+          </div>
+        </div>
+        <!-- Panel de KPIs de profesionales se inyecta dinámicamente -->
+      </div>
+    </section>
+
+    <!-- SETTINGS SECTION -->
+    <section id="section-settings" class="section">
+      <h2>⚙️ Configuración</h2>
+      
+      <div id="settingsContainer">
+        <!-- TEMA Y APARIENCIA -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <h3>🎨 Tema y Apariencia</h3>
+            <p class="settings-description">Personaliza cómo se ve el dashboard</p>
+          </div>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <label for="themeToggle" class="setting-label">
+                <span>Modo Oscuro</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="themeToggle" class="toggle-input" />
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <label class="setting-label">Contraste Automático</label>
+              <select id="contrastLevel" class="settings-select">
+                <option value="normal">Normal</option>
+                <option value="high">Alto</option>
+                <option value="extra">Muy Alto</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <h3>📊 Configuración de Tabla</h3>
+            <p class="settings-description">Ajusta cómo se muestra la tabla de datos</p>
+          </div>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <label class="setting-label">Filas por Página</label>
+              <select id="rowsPerPage" class="settings-select">
+                <option value="10">10 filas</option>
+                <option value="20" selected>20 filas</option>
+                <option value="50">50 filas</option>
+                <option value="100">100 filas</option>
+              </select>
+            </div>
+            
+            <div class="setting-item">
+              <label for="autoRefresh" class="setting-label">
+                <span>Auto-actualizar cada 5 min</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="autoRefresh" class="toggle-input" />
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <label class="setting-label">Formato de Fecha</label>
+              <select id="dateFormat" class="settings-select">
+                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <h3>📈 Gráficos</h3>
+            <p class="settings-description">Configura qué gráficos mostrar</p>
+          </div>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <label for="showAnimations" class="setting-label">
+                <span>Animaciones en Gráficos</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="showAnimations" class="toggle-input" checked />
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <label for="showLegends" class="setting-label">
+                <span>Mostrar Leyendas</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="showLegends" class="toggle-input" />
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <label class="setting-label">Resolución de Gráficos</label>
+              <select id="chartQuality" class="settings-select">
+                <option value="low">Baja (más rápido)</option>
+                <option value="medium" selected>Media</option>
+                <option value="high">Alta (más detalles)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTROS Y DATOS -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <h3>🔧 Filtros y Datos</h3>
+            <p class="settings-description">Gestiona filtros y configuración de datos</p>
+          </div>
+          
+          <div class="settings-group">
+            <div class="setting-item">
+              <label for="saveFilters" class="setting-label">
+                <span>Guardar Filtros Automáticamente</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="saveFilters" class="toggle-input" checked />
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <label for="showNotifications" class="setting-label">
+                <span>Mostrar Notificaciones</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="showNotifications" class="toggle-input" checked />
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <label class="setting-label">Separador de miles
+                <select id="thousandSeparator" class="settings-select">
+                  <option value="," selected>Coma (,)</option>
+                  <option value=".">Punto (.)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          
+          <div class="settings-actions">
+            <button id="resetFiltersBtn" class="settings-btn settings-btn-secondary">🔄 Restablecer Filtros</button>
+            <button id="exportSettingsBtn" class="settings-btn settings-btn-primary">💾 Guardar Configuración</button>
+            <button id="importSettingsBtn" class="settings-btn settings-btn-primary">📂 Cargar Configuración</button>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN DEL SISTEMA -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <h3>ℹ️ Información del Sistema</h3>
+            <p class="settings-description">Detalles técnicos y datos guardados</p>
+          </div>
+          
+          <div class="settings-info">
+            <div class="info-item">
+              <span class="info-label">Versión:</span>
+              <span class="info-value">2.0.0</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Datos en Caché:</span>
+              <span class="info-value" id="cacheSize">0 bytes</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Última Actualización:</span>
+              <span class="info-value" id="lastUpdate">Nunca</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Registros Cargados:</span>
+              <span class="info-value" id="recordCount">0</span>
+            </div>
+          </div>
+          
+          <div class="settings-actions">
+            <button id="clearCacheBtn" class="settings-btn settings-btn-danger">🗑️ Limpiar Caché</button>
+            <button id="checkUpdatesBtn" class="settings-btn settings-btn-secondary">🔍 Buscar Actualizaciones</button>
+          </div>
+        </div>
+
+        <!-- TEMA DE COLOR -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <h3>🎯 Tema de Color Primario</h3>
+            <p class="settings-description">Elige tu color favorito para el dashboard</p>
+          </div>
+          
+          <div class="color-palette">
+            <button class="color-btn" data-color="#1f8ac0" title="Azul por defecto" style="background-color: #1f8ac0; border: 3px solid #1f8ac0;"></button>
+            <button class="color-btn" data-color="#6366f1" title="Índigo" style="background-color: #6366f1;"></button>
+            <button class="color-btn" data-color="#8b5cf6" title="Púrpura" style="background-color: #8b5cf6;"></button>
+            <button class="color-btn" data-color="#ec4899" title="Rosa" style="background-color: #ec4899;"></button>
+            <button class="color-btn" data-color="#f59e0b" title="Ámbar" style="background-color: #f59e0b;"></button>
+            <button class="color-btn" data-color="#10b981" title="Verde" style="background-color: #10b981;"></button>
+            <button class="color-btn" data-color="#06b6d4" title="Cyan" style="background-color: #06b6d4;"></button>
+            <button class="color-btn" data-color="#ef4444" title="Rojo" style="background-color: #ef4444;"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div> <!-- END MAIN -->
+
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
+
+  <script>
+    /* ============================================================= */
+/* GLOBAL STATE */
+/* ============================================================= */
+
+let rawData = [];
+let filteredData = [];
+let customersList = new Set();
+let customerField = null; // detected column name for customer data
+let creatorField = null; // detected column name for creator/author
+let ownerField = null; // detected column name for owner
+let charts = {};
+let heatmapMatrix = Array.from({ length: 7 }, () => Array(24).fill(0));
+let weekdayCounts = {
+  Mon: 0,
+  Tue: 0,
+  Wed: 0,
+  Thu: 0,
+  Fri: 0,
+  Weekend: 0,
+};
+
+/* Equipment Mapping */
+const DEFAULT_MAPPING = [
+  { prefix: "XN", group: "HUM" },
+  { prefix: "RU", group: "HUM" },
+  { prefix: "TS", group: "HUM" },
+  { prefix: "SP", group: "HUM" },
+  { prefix: "EXTENDED", group: "HUM" },
+  { prefix: "DM", group: "HUM" },
+  { prefix: "DC", group: "HUM" },
+  { prefix: "XP", group: "HUM" },
+  { prefix: "POC", group: "HUM" },
+  { prefix: "XQ", group: "HUM" },
+  { prefix: "BT", group: "HUM" },
+  { prefix: "IPU", group: "HUM" },
+  { prefix: "XR", group: "HUM" },
+  { prefix: "RAL", group: "HUM" },
+  { prefix: "DI", group: "HUM" },
+  { prefix: "CV", group: "HUM" },
+
+  { prefix: "U", group: "URI" },
+
+  { prefix: "RP", group: "OSNA" },
+  { prefix: "RD-210", group: "OSNA" },
+  { prefix: "SENTIMAG", group: "OSNA" },
+
+  { prefix: "SENTIFIT", group: "OTHERS" },
+];
+
+/* Short helper */
+const $ = (id) => document.getElementById(id);
+
+/* ============================================================= */
+/* NUMBER FORMATTING HELPERS */
+/* ============================================================= */
+function getThousandSeparator() {
+  try {
+    const s = JSON.parse(localStorage.getItem('cscSettings') || '{}');
+    return s.thousandSeparator || ',';
+  } catch (e) {
+    return ',';
+  }
+}
+
+function formatNumber(n, decimals) {
+  if (n === null || n === undefined || n === '') return '';
+  const num = Number(n);
+  if (!isFinite(num)) return String(n);
+
+  if (typeof decimals === 'number') {
+    const fixed = num.toFixed(decimals);
+    const parts = fixed.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, getThousandSeparator());
+    return parts.join('.');
+  }
+
+  return String(Math.round(num)).replace(/\B(?=(\d{3})+(?!\d))/g, getThousandSeparator());
+}
+
+/* ============================================================= */
+/* EQUIPMENT GROUP RESOLUTION */
+/* ============================================================= */
+
+function getEquipmentGroup(assetRaw) {
+  const asset = String(assetRaw || "")
+    .toUpperCase()
+    .trim();
+  for (const r of DEFAULT_MAPPING) {
+    if (asset.startsWith(r.prefix)) return r.group;
+  }
+  return "OTHERS";
+}
+
+/* ============================================================= */
+/* EXCEL DATE PARSING */
+/* ============================================================= */
+
+function parseExcelDate(v) {
+  if (v instanceof Date) return v;
+
+  if (typeof v === "number") {
+    const d = XLSX.SSF.parse_date_code(v);
+    return new Date(d.y, d.m - 1, d.d, d.H || 0, d.M || 0);
+  }
+
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
+}
+
+function populateMonthSelector() {
+  const sel = $("monthSelector");
+  if (!sel) return;
+  const months = new Set();
+  filteredData.forEach((r) => {
+    const d = parseExcelDate(r['Created On']);
+    if (!d) return;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    months.add(key);
+  });
+
+  const arr = [...months].sort((a, b) => b.localeCompare(a));
+  const prev = sel.value || 'ALL';
+  sel.innerHTML = '<option value="ALL">Todos</option>';
+  arr.forEach((v) => {
+    const [y, m] = v.split('-').map(Number);
+    const date = new Date(y, m - 1, 1);
+    const label = date.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+    sel.appendChild(opt);
+  });
+
+  if (arr.includes(prev)) sel.value = prev;
+  else sel.value = 'ALL';
+}
+
+/* ============================================================= */
+/* NAVIGATION BETWEEN SECTIONS */
+/* ============================================================= */
+
+document.querySelectorAll(".sidebar-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document
+      .querySelectorAll(".sidebar-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    document
+      .querySelectorAll(".section")
+      .forEach((s) => s.classList.remove("active"));
+
+    const targetId = "section-" + btn.dataset.section;
+    $(targetId).classList.add("active");
+
+    // Hide heatmap unless the heatmap section is active
+    const hm = $("heatmapContainer");
+    if (hm) {
+      if (btn.dataset.section !== "heatmap") {
+        hm.style.display = "none";
+        hm.innerHTML = ""; // clear to avoid duplicated rendering
+      } else {
+        hm.style.display = "block";
+        // regenerate heatmap for current filters
+        try { updateHeatmap(); } catch (e) { /* ignore */ }
+      }
+    }
+  });
+});
+
+/* Mobile menu toggle */
+const menuToggle = document.getElementById("menuToggle");
+if (menuToggle) {
+  menuToggle.addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-open");
+  });
+
+  // close sidebar on resize to large screens
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900 && document.body.classList.contains("sidebar-open")) {
+      document.body.classList.remove("sidebar-open");
+    }
+  });
+}
+
+/* Sidebar toggle for large screens */
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-hidden');
+  });
+}
+
+// Helper: open sample triggers file dialog (convenience)
+const _openSample = $('openSample');
+if (_openSample) {
+  _openSample.addEventListener('click', () => {
+    const f = $('fileInput');
+    if (f) f.click();
+  });
+}
+
+/* ============================================================= */
+/* DARK MODE */
+/* ============================================================= */
+
+$("toggleDark").onclick = (e) => {
+  document.body.classList.toggle("dark");
+  const btn = e.currentTarget;
+  btn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+};
+
+/* ============================================================= */
+/* LOAD EXCEL FILE */
+/* ============================================================= */
+
+$("fileInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = (evt) => {
+    const workbook = XLSX.read(new Uint8Array(evt.target.result), {
+      type: "array",
+    });
+    const sheet = workbook.Sheets["CSC | ALL CASES"];
+
+    if (!sheet) {
+      alert("Sheet 'CSC | ALL CASES' not found.");
+      return;
+    }
+
+    /* Convert to JSON */
+    rawData = XLSX.utils.sheet_to_json(sheet).filter((r) =>
+      String(r["Queue"] || "")
+        .toUpperCase()
+        .includes("CSC"),
+    );
+
+    // Detect which column contains customer names (look for any key containing 'customer')
+    if (rawData.length > 0) {
+      const keys = Object.keys(rawData[0]);
+      const found = keys.find((k) => k.toLowerCase().includes('customer'));
+      customerField = found || null;
+
+      // Detect creator/author column (look for common variants)
+      const creatorFound = keys.find((k) => {
+        const kk = k.toLowerCase();
+        return /creator|created by|created_by|createdby|author/.test(kk);
+      });
+      creatorField = creatorFound || null;
+
+      // Detect owner/assignee column (look for 'owner', 'assigned to', 'assignee')
+      const ownerFound = keys.find((k) => {
+        const kk = k.toLowerCase();
+        return /owner|assigned to|assigned_to|assignee/.test(kk);
+      });
+      ownerField = ownerFound || null;
+    } else {
+      customerField = null;
+      creatorField = null;
+    }
+
+    /* Build customer/hospital list using detected field (fallbacks supported) */
+    customersList = new Set(
+      rawData
+        .map((r) => {
+          const v = customerField ? r[customerField] : r['Customer Name'] || r['Customer'];
+          return (v || '').toString().trim();
+        })
+        .filter((x) => x),
+    );
+
+    /* Build hospital filter dropdown */
+    const hospitalSelect = $("filterHospital");
+    hospitalSelect.innerHTML = `<option value="ALL">Todos</option>`;
+
+    [...customersList].sort().forEach((h) => {
+      const opt = document.createElement("option");
+      opt.value = h;
+      opt.textContent = h;
+      hospitalSelect.appendChild(opt);
+    });
+
+    applyFilters();
+  };
+
+  reader.readAsArrayBuffer(file);
+});
+
+/* ============================================================= */
+/* APPLY & CLEAR FILTERS */
+/* ============================================================= */
+
+$("applyFilters").onclick = applyFilters;
+
+$("clearFilters").onclick = () => {
+  $("filterDateFrom").value = "";
+  $("filterDateTo").value = "";
+  $("filterEquipment").value = "ALL";
+  $("filterQueue").value = "ALL";
+  $("filterHours").value = "ALL";
+  $("filterHospital").value = "ALL";
+
+  applyFilters();
+};
+
+/* ============================================================= */
+/* FILTER ENGINE */
+/* ============================================================= */
+
+function applyFilters() {
+  const fFrom = $("filterDateFrom").value
+    ? new Date($("filterDateFrom").value)
+    : null;
+  const fTo = $("filterDateTo").value
+    ? new Date($("filterDateTo").value + "T23:59:59")
+    : null;
+
+  const fEquip = $("filterEquipment").value;
+  const fQueue = $("filterQueue").value;
+  const fHours = $("filterHours").value;
+
+  const fHospital = $("filterHospital").value.toLowerCase();
+
+  filteredData = rawData.filter((r) => {
+    const date = parseExcelDate(r["Created On"]);
+    if (!date) return false;
+
+    if (fFrom && date < fFrom) return false;
+    if (fTo && date > fTo) return false;
+
+    const eqGroup = getEquipmentGroup(r["Customer Asset"]);
+    if (fEquip !== "ALL" && eqGroup !== fEquip) return false;
+
+    const q = String(r["Queue"] || "").toUpperCase();
+    if (fQueue !== "ALL" && !q.includes(fQueue)) return false;
+
+    if (fHours === "WORKING" && (date.getHours() < 8 || date.getHours() >= 17))
+      return false;
+    if (fHours === "OFF" && date.getHours() >= 8 && date.getHours() < 17)
+      return false;
+
+    if (fHospital !== "all") {
+      const hv = (customerField ? String(r[customerField] || '') : String(r['Customer Name'] || '')).toLowerCase();
+      if (hv !== fHospital) return false;
+    }
+
+    return true;
+  });
+
+  updateAll();
+}
+
+/* ============================================================= */
+/* MASTER UPDATE FUNCTION */
+/* ============================================================= */
+
+function updateAll() {
+  destroyCharts();
+  updateKPIs();
+  updateCharts();
+  updateProfessionals();
+  try { populateClientSelector(); } catch (e) {}
+  updateClientView();
+  updateHeatmap();
+  updateTable();
+}
+
+/* Destroy existing charts before repainting */
+function destroyCharts() {
+  Object.values(charts).forEach((c) => c?.destroy());
+  charts = {};
+}
+/* ============================================================= */
+/* KPI UPDATE */
+/* ============================================================= */
+
+// Animaci\u00f3n num\u00e9rica para KPIs
+function animateValue(id, start, end, duration = 700) {
+  const obj = $(id);
+  if (!obj) return;
+  start = Number(start) || 0;
+  end = Number(end) || 0;
+  if (start === end) {
+    obj.textContent = formatNumber(end);
+    return;
+  }
+
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  const startTime = performance.now();
+
+  const frame = (now) => {
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const eased = easeOutCubic(t);
+    const current = Math.round(start + (end - start) * eased);
+    obj.textContent = formatNumber(current);
+    if (t < 1) requestAnimationFrame(frame);
+    else obj.textContent = formatNumber(end);
+  };
+
+  requestAnimationFrame(frame);
+}
+
+function updateKPIs() {
+  let ses = 0,
+    spt = 0,
+    off = 0;
+
+  const total = Array.isArray(filteredData) ? filteredData.length : 0;
+
+  // If no data loaded, show zeros and avoid iterating
+  if (total === 0) {
+    animateValue('kpiTotal', parseInt($('kpiTotal')?.textContent.replace(/\D/g,'')) || 0, 0, 0);
+    animateValue('kpiSes', parseInt($('kpiSes')?.textContent.replace(/\D/g,'')) || 0, 0, 0);
+    animateValue('kpiSpt', parseInt($('kpiSpt')?.textContent.replace(/\D/g,'')) || 0, 0, 0);
+    animateValue('kpiOff', parseInt($('kpiOff')?.textContent.replace(/\D/g,'')) || 0, 0, 0);
+    const dayMostEl = $('kpiDayMost'); if (dayMostEl) dayMostEl.textContent = '-';
+    animateValue('kpiAvgDaily', parseInt($('kpiAvgDaily')?.textContent.replace(/\D/g,'')) || 0, 0, 0);
+    return;
+  }
+
+  filteredData.forEach((r) => {
+    const q = String(r["Queue"] || "").toUpperCase();
+
+    if (q.includes("SES")) ses++;
+    if (q.includes("SPT")) spt++;
+
+    const d = parseExcelDate(r["Created On"]);
+    if (!d) return;
+
+    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+    const isOffHours = d.getHours() < 8 || d.getHours() >= 17;
+
+    if (isWeekend || isOffHours) off++;
+  });
+
+  // compute daily stats (by calendar day)
+  const dailyCounts = {};
+  filteredData.forEach((r) => {
+    const d = parseExcelDate(r['Created On']);
+    if (!d) return;
+    const dateStr = d.toISOString().slice(0, 10);
+    dailyCounts[dateStr] = (dailyCounts[dateStr] || 0) + 1;
+  });
+
+  const daysKeys = Object.keys(dailyCounts);
+  let avgDaily = 0;
+  let dayMostText = '-';
+  if (daysKeys.length > 0) {
+    const totalDays = daysKeys.length;
+    avgDaily = Math.round(Object.values(dailyCounts).reduce((a, b) => a + b, 0) / totalDays);
+    // find day with max cases
+    let maxDate = daysKeys[0];
+    let maxCount = dailyCounts[maxDate];
+    daysKeys.forEach((k) => { if (dailyCounts[k] > maxCount) { maxCount = dailyCounts[k]; maxDate = k; } });
+    const full = new Date(maxDate).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    // Capitalize first letter and append count: 'martes, 23 de enero de 2025' -> 'Martes 23 de enero de 2025 (12)'
+    const pretty = full.charAt(0).toUpperCase() + full.slice(1).replace(',', '');
+    dayMostText = `${pretty} (${maxCount})`;
+  }
+
+  // Calculate client with most cases
+  let clientCounts = {};
+  let customerKey = null;
+  if (filteredData.length > 0) {
+    const keys = Object.keys(filteredData[0]);
+    customerKey = keys.find(k => k.toLowerCase() === 'customer');
+  }
+  // Exclude 'ROCHE DIAGNOSTICS S.L.' from the ranking
+  if (customerKey) {
+    filteredData.forEach((r) => {
+      const client = (r[customerKey] || '').toString().trim();
+      if (!client || client.toUpperCase() === 'ROCHE DIAGNOSTICS S.L.') return;
+      clientCounts[client] = (clientCounts[client] || 0) + 1;
+    });
+  }
+  // Find the client with the most cases (excluding ROCHE DIAGNOSTICS S.L.)
+  let topClient = '-';
+  let topClientCount = 0;
+  for (const [client, count] of Object.entries(clientCounts)) {
+    if (count > topClientCount) {
+      topClient = client;
+      topClientCount = count;
+    }
+  }
+  const topClientEl = $('kpiTopClient');
+  if (topClientEl) topClientEl.textContent = topClient !== '-' ? topClient : '-';
+
+  // Update the unified KPI card values
+  animateValue('kpiTotal', parseInt($('kpiTotal')?.textContent.replace(/\D/g,'')) || 0, total, 700);
+  animateValue('kpiCalls', parseInt($('kpiCalls')?.textContent.replace(/\D/g,'')) || 0, total * 4, 700);
+  animateValue('kpiSes', parseInt($('kpiSes')?.textContent.replace(/\D/g,'')) || 0, ses, 700);
+  animateValue('kpiSpt', parseInt($('kpiSpt')?.textContent.replace(/\D/g,'')) || 0, spt, 700);
+  animateValue('kpiOff', parseInt($('kpiOff')?.textContent.replace(/\D/g,'')) || 0, off, 700);
+  const dayMostEl = $('kpiDayMost'); if (dayMostEl) dayMostEl.textContent = dayMostText;
+  animateValue('kpiAvgDaily', parseInt($('kpiAvgDaily')?.textContent.replace(/\D/g,'')) || 0, avgDaily, 700);
+}
+
+/* ============================================================= */
+/* CHARTS */
+/* ============================================================= */
+
+function updateCharts() {
+  // ensure month selector reflects available data
+  try { populateMonthSelector(); } catch (e) { /* ignore */ }
+  const noLegend = { responsive: true, maintainAspectRatio: true, aspectRatio: 1.6, plugins: { legend: { display: false } } };
+
+  /* ---------------------------------------------- */
+  /* DAILY CASES */
+  /* ---------------------------------------------- */
+
+  // If a month is selected, limit the daily series to that month
+  const monthSel = $("monthSelector")?.value || 'ALL';
+  const dailySource = (monthSel && monthSel !== 'ALL')
+    ? filteredData.filter((r) => {
+        const d = parseExcelDate(r['Created On']);
+        if (!d) return false;
+        const [y, m] = monthSel.split('-').map(Number);
+        return d.getFullYear() === y && d.getMonth() === (m - 1);
+      })
+    : filteredData;
+
+  const daily = {};
+  dailySource.forEach((r) => {
+    const d = parseExcelDate(r["Created On"]);
+    if (!d) return;
+    const key = d.toISOString().split("T")[0];
+    daily[key] = (daily[key] || 0) + 1;
+  });
+
+  const dailySorted = Object.entries(daily).sort((a, b) =>
+    a[0].localeCompare(b[0]),
+  );
+
+  charts.daily = new Chart($("chartDaily"), {
+    type: "line",
+    data: {
+      labels: dailySorted.map((x) => x[0]),
+      datasets: [
+        {
+          data: dailySorted.map((x) => x[1]),
+          borderColor: "#1f8ac0",
+          backgroundColor: "rgba(31,138,192,0.25)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: noLegend,
+  });
+
+  /* CHARTS SECTION - DAILY2 */
+  if ($("chartDaily2")) {
+    charts.daily2 = new Chart($("chartDaily2"), {
+      type: "line",
+      data: {
+        labels: dailySorted.map((x) => x[0]),
+        datasets: [
+          {
+            data: dailySorted.map((x) => x[1]),
+            borderColor: "#1f8ac0",
+            borderWidth: 2,
+            tension: 0.3,
+          },
+        ],
+      },
+      options: noLegend,
+    });
+  }
+
+  /* ---------------------------------------------- */
+  /* EQUIPMENT GROUPS */
+  /* ---------------------------------------------- */
+
+  const groups = { HUM: 0, URI: 0, OSNA: 0, OTHERS: 0 };
+
+  filteredData.forEach((r) => {
+    const g = getEquipmentGroup(r["Customer Asset"]);
+    groups[g]++;
+  });
+
+  // Get corporate colors from CSS variables
+  function getCorporateColors() {
+    const styles = getComputedStyle(document.documentElement);
+    return [
+      styles.getPropertyValue('--primary').trim() || '#1f8ac0',
+      styles.getPropertyValue('--primary-2').trim() || '#4db27a',
+      styles.getPropertyValue('--primary-dark').trim() || '#166892',
+      '#9aa8b5'
+    ];
+  }
+
+  charts.groups = new Chart($("chartGroups"), {
+    type: "pie",
+    data: {
+      labels: Object.keys(groups),
+      datasets: [
+        {
+          data: Object.values(groups),
+          backgroundColor: getCorporateColors(),
+          borderWidth: 2,
+          borderColor: '#fff',
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: getComputedStyle(document.documentElement).getPropertyValue('--text') || '#23272f',
+            font: { family: 'Inter, Segoe UI, Arial, sans-serif', size: 14, weight: '600' },
+            padding: 20,
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.label || '';
+              let value = context.parsed || 0;
+              let total = context.chart._metasets[context.datasetIndex].total;
+              let percent = total ? ((value / total) * 100).toFixed(1) : 0;
+              return `${label}: ${value} (${percent}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  /* CHARTS SECTION - GROUPS2 */
+  if ($("chartGroups2")) {
+    charts.groups2 = new Chart($("chartGroups2"), {
+      type: "bar",
+      data: {
+        labels: Object.keys(groups),
+        datasets: [
+          {
+            data: Object.values(groups),
+            backgroundColor: ["#1f8ac0", "#4db27a", "#166892", "#9aa8b5"],
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: noLegend,
+    });
+  }
+
+  /* ---------------------------------------------- */
+  /* SES vs SPT */
+  /* ---------------------------------------------- */
+
+  let ses = 0,
+    spt = 0;
+  filteredData.forEach((r) => {
+    const q = String(r["Queue"] || "").toUpperCase();
+    if (q.includes("SES")) ses++;
+    if (q.includes("SPT")) spt++;
+  });
+
+  // Mostrar porcentajes SES y SPT en tarjetas
+  const totalSesSpt = ses + spt;
+  const percentSes = totalSesSpt > 0 ? ((ses / totalSesSpt) * 100).toFixed(1) : '0.0';
+  const percentSpt = totalSesSpt > 0 ? ((spt / totalSesSpt) * 100).toFixed(1) : '0.0';
+  if (document.getElementById('sesPercent')) {
+    document.getElementById('sesPercent').textContent = percentSes + '%';
+  }
+  if (document.getElementById('sptPercent')) {
+    document.getElementById('sptPercent').textContent = percentSpt + '%';
+  }
+
+  // Calcular medias diarias SES y SPT
+  // Calcular días únicos con al menos un caso SES y SPT
+  // Calcular el día con más casos SES y SPT
+
+  /* ---------------------------------------------- */
+  /* QUEUE DISTRIBUTION */
+  /* ---------------------------------------------- */
+
+  const queueDist = {
+    "SES-L1": 0,
+    "SES-L2": 0,
+    "SES-DISPATCH": 0,
+    "SPT-L1": 0,
+    "SPT-L2": 0,
+    "SPT-DISPATCH": 0,
+  };
+
+  filteredData.forEach((r) => {
+    const q = String(r["Queue"] || "").toUpperCase();
+
+    if (q.includes("SES")) {
+      if (q.includes("L1")) queueDist["SES-L1"]++;
+      else if (q.includes("L2")) queueDist["SES-L2"]++;
+      else queueDist["SES-DISPATCH"]++;
+    }
+
+    if (q.includes("SPT")) {
+      if (q.includes("L1")) queueDist["SPT-L1"]++;
+      else if (q.includes("L2")) queueDist["SPT-L2"]++;
+      else queueDist["SPT-DISPATCH"]++;
+    }
+  });
+
+  charts.queues = new Chart($("chartQueues"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(queueDist),
+      datasets: [
+        {
+          data: Object.values(queueDist),
+          backgroundColor: [
+            "#1f8ac0",
+            "#166892",
+            "#0b4d68",
+            "#4db27a",
+            "#3c8a62",
+            "#2a6547",
+          ],
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: noLegend,
+  });
+
+  /* ---------------------------------------------- */
+  /* PEAK HOURS (curved line) - remapped 05:00 -> 00:00 */
+  /* ---------------------------------------------- */
+
+  const hoursCount = Array(24).fill(0);
+  filteredData.forEach((r) => {
+    const d = parseExcelDate(r["Created On"]);
+    if (d) hoursCount[d.getHours()]++;
+  });
+
+  const hoursOrder = [...Array(19).keys()].map((i) => i + 5).concat([0]); // 5..23,0
+  const hoursLabels = hoursOrder.map((h) => `${String(h).padStart(2,'0')}:00`);
+  const hoursData = hoursOrder.map((h) => hoursCount[h]);
+
+  charts.peak = new Chart($("chartPeakHours"), {
+    type: "line",
+    data: {
+      labels: hoursLabels,
+      datasets: [
+        {
+          data: hoursData,
+          borderColor: "#1f8ac0",
+          backgroundColor: "rgba(31,138,192,0.08)",
+          tension: 0.4,
+          pointRadius: 3,
+          fill: true,
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: noLegend,
+  });
+
+  /* ---------------------------------------------- */
+  /* CASES BY WEEKDAY */
+  /* ---------------------------------------------- */
+
+  weekdayCounts = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Weekend: 0 };
+
+  filteredData.forEach((r) => {
+    const d = parseExcelDate(r["Created On"]);
+    if (!d) return;
+
+    const day = d.getDay();
+    if (day === 1) weekdayCounts.Mon++;
+    else if (day === 2) weekdayCounts.Tue++;
+    else if (day === 3) weekdayCounts.Wed++;
+    else if (day === 4) weekdayCounts.Thu++;
+    else if (day === 5) weekdayCounts.Fri++;
+    else weekdayCounts.Weekend++;
+  });
+
+  const wdLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Weekend"];
+  const wdValues = wdLabels.map((l) => weekdayCounts[l]);
+
+  charts.weekday = new Chart($("chartWeekday"), {
+    type: "bar",
+    data: {
+      labels: wdLabels,
+      datasets: [
+        {
+          data: wdValues,
+          backgroundColor: "#1f8ac0",
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: noLegend,
+  });
+
+  /* WEEKDAY ANALYSIS SECTION */
+  if ($("chartWeekday2")) {
+    charts.weekday2 = new Chart($("chartWeekday2"), {
+      type: "bar",
+      data: {
+        labels: wdLabels,
+        datasets: [
+          {
+            data: wdValues,
+            backgroundColor: "#1f8ac0",
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: noLegend,
+    });
+  }
+}
+
+/* ============================================================= */
+/* HEATMAP */
+/* ============================================================= */
+
+/* ============================================================= */
+/* CREATORS */
+/* ============================================================= */
+// creators section removed; unified `updateAuthors()` handles creators and owners
+
+// Render a heatmap into an arbitrary container using provided data (or filteredData)
+function renderHeatmapTo(containerId, dataSource) {
+  const container = $(containerId);
+  if (!container) return;
+
+  const monthSel = $("monthSelector")?.value || 'ALL';
+  const source = dataSource || filteredData;
+  const data = (monthSel && monthSel !== 'ALL')
+    ? source.filter((r) => {
+        const d = parseExcelDate(r['Created On']);
+        if (!d) return false;
+        const [y, m] = monthSel.split('-').map(Number);
+        return d.getFullYear() === y && d.getMonth() === (m - 1);
+      })
+    : source;
+
+  const matrix = Array.from({ length: 7 }, () => Array(24).fill(0));
+  data.forEach((r) => {
+    const d = parseExcelDate(r['Created On']);
+    if (!d) return;
+    matrix[d.getDay()][d.getHours()]++;
+  });
+
+  const max = Math.max(...matrix.flat());
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const order = [1,2,3,4,5,6,0];
+
+  let html = "<table style='width:100%; border-collapse:collapse; text-align:center;'>";
+  html += "<tr><th></th>";
+  for (let h = 0; h < 24; h++) html += `<th>${h}</th>`;
+  html += "</tr>";
+
+  for (let i = 0; i < 7; i++) {
+    const d = order[i];
+    html += `<tr><th>${days[i]}</th>`;
+    for (let h = 0; h < 24; h++) {
+      const value = matrix[d][h];
+      // use sqrt scaling for better visibility on low counts, and minimum alpha
+      const ratio = max === 0 ? 0 : value / max;
+      const scaled = Math.sqrt(ratio);
+      const alpha = Math.min(1, 0.12 + 0.88 * scaled);
+      const color = `rgba(31,138,192, ${alpha})`;
+      const textColor = alpha < 0.28 ? getComputedStyle(document.documentElement).getPropertyValue('--text') : 'white';
+
+      html += `<td style="padding:6px 8px;background:${color};color:${textColor};font-size:12px;border:1px solid rgba(0,0,0,0.06)">${value}</td>`;
+    }
+    html += `</tr>`;
+  }
+  html += `</table>`;
+  container.innerHTML = html;
+}
+
+// Populate client selector from detected customersList
+function populateClientSelector() {
+  const sel = $('clientSelector');
+  if (!sel) return;
+  const prev = sel.value || 'ALL';
+  sel.innerHTML = '<option value="ALL">Todos</option>';
+  [...customersList].sort().forEach((c) => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    sel.appendChild(opt);
+  });
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+function updateClientView() {
+  const sel = $('clientSelector');
+  const search = $('clientSearch')?.value?.toLowerCase() || '';
+  if (sel && sel.options.length <= 1) populateClientSelector();
+
+  const selected = sel ? sel.value : 'ALL';
+
+  const clientData = filteredData.filter((r) => {
+    const v = customerField ? String(r[customerField] || '') : String(r['Customer Name'] || r['Customer'] || '');
+    const vs = v.toLowerCase();
+    if (search && !vs.includes(search)) return false;
+    if (selected && selected !== 'ALL' && v !== selected) return false;
+    return true;
+  });
+
+  const kpiEl = $('clientKpis');
+  if (kpiEl) {
+    const total = clientData.length;
+    const daily = dailyCount(clientData);
+    const days = Object.keys(daily);
+    const avg = days.length ? Math.round(Object.values(daily).reduce((a,b)=>a+b,0)/days.length) : 0;
+    let maxText = '-';
+    if (days.length) {
+      let maxDate = days[0];
+      let maxCount = daily[maxDate];
+      days.forEach((d) => { if (daily[d] > maxCount) { maxCount = daily[d]; maxDate = d; } });
+      const pretty = new Date(maxDate).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      maxText = pretty.charAt(0).toUpperCase() + pretty.slice(1) + ` (${maxCount})`;
+    }
+
+    kpiEl.innerHTML = `
+      <div class="kpi-card" style="min-width:160px"><div class="kpi-label">Total (Cliente)</div><div class="kpi-value">${formatNumber(total)}</div></div>
+      <div class="kpi-card" style="min-width:160px"><div class="kpi-label">Media diaria</div><div class="kpi-value">${formatNumber(avg)}</div></div>
+      <div class="kpi-card" style="min-width:240px"><div class="kpi-label">Día con más casos</div><div class="kpi-value">${maxText}</div></div>
+    `;
+  }
+
+  // Daily chart for client
+  charts.clientDaily?.destroy();
+  const daily = dailyCount(clientData);
+  const labels = Object.keys(daily).sort();
+  const values = labels.map(k => daily[k] || 0);
+  const el = $('chartClientDaily');
+  if (el) {
+    charts.clientDaily = new Chart(el, {
+      type: 'line',
+      data: { labels, datasets: [{ data: values, borderColor: '#1f8ac0', backgroundColor: 'rgba(31,138,192,0.12)', fill:true, tension:0.25 }] },
+      options: { responsive:true, maintainAspectRatio:true }
+    });
+  }
+
+  // Render equipment cards
+  renderClientEquipmentCards(clientData);
+
+  // render client heatmap
+  renderHeatmapTo('clientHeatmapContainer', clientData);
+}
+
+// Render equipment cards (Customer Asset counts)
+function renderClientEquipmentCards(clientData) {
+  const container = $('clientEquipmentsContainer');
+  if (!container) return;
+
+  const assetCounts = {};
+  clientData.forEach((r) => {
+    const a = (r['Customer Asset'] || r['CustomerAsset'] || r['Asset'] || '').toString().trim();
+    if (!a) return;
+    assetCounts[a] = (assetCounts[a] || 0) + 1;
+  });
+
+  const assetLabels = Object.keys(assetCounts).sort((a,b)=>assetCounts[b]-assetCounts[a]);
+  if (!assetLabels.length) {
+    container.innerHTML = '<p style="color:var(--text-soft)">Sin equipos con incidencias.</p>';
+    return;
+  }
+
+  let html = '<h3>Equipos por Incidencias</h3>';
+  html += '<div class="prof-grid" style="margin-top:12px">';
+
+  const maxCount = Math.max(...Object.values(assetCounts));
+
+  assetLabels.forEach((asset) => {
+    const count = assetCounts[asset];
+    const colorA = '#f59e0b';
+    const colorB = '#0b4d68';
+    const initials = asset.split(' ').slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+    const pct = maxCount ? Math.round((count / maxCount) * 100) : 0;
+
+    html += `
+      <div class="prof-card">
+        <div class="prof-avatar" style="background:${colorA}">${initials}</div>
+        <div class="prof-info">
+          <div class="prof-name">${asset}</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+            <div class="prof-metric" style="margin:0"><div class="label">Total</div><div class="value">${formatNumber(count)}</div></div>
+            <div style="flex:1">
+              <div class="prof-bars" style="height:12px;border-radius:8px;overflow:hidden;background:rgba(0,0,0,0.05);">
+                <div style="height:100%;width:${pct}%;background:${colorA};"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// Render professionals cards (creator + owner counts)
+function updateProfessionals() {
+
+  // Fill top 3 creators and owners cards
+  const topCreatorsList = document.getElementById('topCreatorsList');
+  const topOwnersList = document.getElementById('topOwnersList');
+  if (topCreatorsList && topOwnersList) {
+    // Count creators
+    const creatorCounts = {};
+    const ownerCounts = {};
+    filteredData.forEach((r) => {
+      if (creatorField && r[creatorField]) {
+        const name = String(r[creatorField]).trim();
+        if (name) creatorCounts[name] = (creatorCounts[name] || 0) + 1;
+      }
+      if (ownerField && r[ownerField]) {
+        const name = String(r[ownerField]).trim();
+        if (name) ownerCounts[name] = (ownerCounts[name] || 0) + 1;
+      }
+    });
+    // Top 3 creators
+    const topCreators = Object.entries(creatorCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    // Top 3 owners
+    const topOwners = Object.entries(ownerCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    topCreatorsList.innerHTML = topCreators.length ? topCreators.map(([name, count],i) => `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="font-weight:700;font-size:16px;color:var(--primary)">${i+1}.</span> <span style="flex:1">${name}</span> <span style="font-weight:700">${formatNumber(count)}</span></div>`).join('') : '<span style="color:var(--text-soft)">Sin datos</span>';
+    topOwnersList.innerHTML = topOwners.length ? topOwners.map(([name, count],i) => `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="font-weight:700;font-size:16px;color:var(--primary-2)">${i+1}.</span> <span style="flex:1">${name}</span> <span style="font-weight:700">${formatNumber(count)}</span></div>`).join('') : '<span style="color:var(--text-soft)">Sin datos</span>';
+  }
+
+  // ...existing code for the rest of the professionals grid...
+  const container = $('professionalsContainer');
+  if (!container) return;
+
+  const cscOnly = $('profCscToggle') ? $('profCscToggle').dataset.active === '1' : false;
+
+  const profSet = new Set();
+  filteredData.forEach((r) => {
+    if (creatorField && r[creatorField]) profSet.add(String(r[creatorField]).trim());
+    if (ownerField && r[ownerField]) profSet.add(String(r[ownerField]).trim());
+  });
+
+  const profs = [...profSet].sort((a,b) => a.localeCompare(b));
+
+  let html = '<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">';
+  html += '<label style="font-weight:600">Mostrar solo CSC</label>';
+  html += '<button id="profCscToggle" class="prof-toggle-btn ' + (cscOnly ? 'active' : '') + '" data-active="' + (cscOnly ? '1' : '0') + '">' + (cscOnly ? 'CSC: ON' : 'CSC: OFF') + '</button>';
+  html += '<div style="flex:1"></div>';
+  html += '<label style="font-weight:600">Ordenar por</label>';
+  html += '<select id="profSort" style="margin-left:8px;padding:6px;border-radius:8px;border:1px solid var(--border)">';
+  html += '<option value="name">Nombre</option>';
+  html += '<option value="created">Creó</option>';
+  html += '<option value="owned">Owner</option>';
+  html += '</select>';
+  html += '</div>';
+
+  html += '<div class="prof-grid">';
+
+  // compute metrics map
+  const profMetrics = profs.map((p) => {
+    const created = filteredData.filter((r) => creatorField && String(r[creatorField]).trim() === p && (!cscOnly || String(r['Queue']||'').toUpperCase().includes('CSC'))).length;
+    const owned = filteredData.filter((r) => ownerField && String(r[ownerField]).trim() === p && (!cscOnly || String(r['Queue']||'').toUpperCase().includes('CSC'))).length;
+    return { name: p, created, owned };
+  });
+
+  // remove professionals with zero counts when CSC-only is active (or in any case hide zero rows)
+  const profMetricsFiltered = profMetrics.filter(m => (m.created || m.owned));
+
+  const sortEl = document.getElementById('profSort');
+  const sortBy = sortEl ? sortEl.value : 'name';
+  profMetricsFiltered.sort((a,b) => {
+    if (sortBy === 'created') return b.created - a.created;
+    if (sortBy === 'owned') return b.owned - a.owned;
+    return a.name.localeCompare(b.name);
+  });
+
+
+  profMetricsFiltered.forEach(({name, created, owned}) => {
+    const total = Math.max(1, created + owned);
+    const pctCreated = Math.round((created / total) * 100);
+    const pctOwned = Math.round((owned / total) * 100);
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#1f8ac0';
+    const colorB = getComputedStyle(document.documentElement).getPropertyValue('--primary-2').trim() || '#4db27a';
+
+    const avatarBg = primaryColor;
+
+    const initials = name.split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
+
+    html += `
+      <div class="prof-card" data-name="${name}">
+        <div class="prof-avatar" style="background:${avatarBg}">${initials}</div>
+        <div class="prof-info">
+          <div class="prof-name">${name}</div>
+          <div class="prof-metrics">
+            <div class="prof-metric"><div class="label">Creó</div><div class="value">${formatNumber(created)}</div></div>
+            <div class="prof-metric"><div class="label">Owner</div><div class="value">${formatNumber(owned)}</div></div>
+            <div class="prof-bars"><div class="bar-created" style="width:${pctCreated}%;background:${primaryColor}"></div><div class="bar-owned" style="width:${pctOwned}%;background:${colorB}"></div></div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+
+  container.innerHTML = html;
+
+  // attach listener for CSC-only toggle and sort
+  const toggleBtn = $('profCscToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const active = toggleBtn.dataset.active === '1';
+      toggleBtn.dataset.active = active ? '0' : '1';
+      toggleBtn.classList.toggle('active', !active);
+      toggleBtn.textContent = !active ? 'CSC: ON' : 'CSC: OFF';
+      updateProfessionals();
+    });
+  }
+  const sortControl = document.getElementById('profSort');
+  if (sortControl) sortControl.addEventListener('change', () => updateProfessionals());
+}
+
+// Export professionals summary as CSV
+function exportProfessionalsCsv() {
+  const profMap = new Map();
+  const cscOnly = $('profCscToggle') ? $('profCscToggle').dataset.active === '1' : false;
+  filteredData.forEach((r) => {
+    if (cscOnly && !String(r['Queue']||'').toUpperCase().includes('CSC')) return;
+    const creator = creatorField ? String(r[creatorField] || '').trim() : '';
+    const owner = ownerField ? String(r[ownerField] || '').trim() : '';
+    if (creator) {
+      const entry = profMap.get(creator) || { created: 0, owned: 0 };
+      entry.created += 1;
+      profMap.set(creator, entry);
+    }
+    if (owner) {
+      const entry = profMap.get(owner) || { created: 0, owned: 0 };
+      entry.owned += 1;
+      profMap.set(owner, entry);
+    }
+  });
+
+  const rows = [];
+  rows.push(['Profesional','Creó','Como owner']);
+  [...profMap.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name, vals]) => {
+    rows.push([name, String(vals.created || 0), String(vals.owned || 0)]);
+  });
+
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'professionals_summary.csv';
+  a.click();
+}
+
+const _exportProfBtn = $('exportProfessionalsCsv');
+if (_exportProfBtn) _exportProfBtn.addEventListener('click', exportProfessionalsCsv);
+
+// document-level click handlers removed (exportAuthorsCsv removed with Authors section)
+
+// hook month selector change to refresh charts
+const _ms = $("monthSelector");
+if (_ms) _ms.addEventListener('change', () => updateCharts());
+
+// client controls listeners
+const _clientApply = $('clientApply');
+if (_clientApply) _clientApply.addEventListener('click', () => updateClientView());
+const _clientSearch = $('clientSearch');
+if (_clientSearch) _clientSearch.addEventListener('input', () => updateClientView());
+const _clientSel = $('clientSelector');
+if (_clientSel) _clientSel.addEventListener('change', () => updateClientView());
+
+// Splash overlay logic (robust init whether DOMContentLoaded already fired)
+function initSplash() {
+  const splash = document.getElementById('splashOverlay');
+  const enter = document.getElementById('enterBtn');
+  if (!splash || !enter) return;
+  const closeSplash = () => {
+    splash.classList.add('hidden');
+    setTimeout(() => { splash.style.display = 'none'; }, 350);
+    // Activate Home / upload section after splash
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const home = document.getElementById('section-home');
+    if (home) home.classList.add('active');
+    // mark sidebar button
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    const hb = document.querySelector('.sidebar-btn[data-section="home"]');
+    if (hb) hb.classList.add('active');
+  };
+  enter.addEventListener('click', closeSplash);
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSplash);
+else initSplash();
+
+// Add expand buttons to charts and modal behavior
+function initChartExpand() {
+  document.querySelectorAll('.chart-box').forEach((box) => {
+    if (box.querySelector('.expand-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'expand-btn';
+    btn.title = 'Ver en grande';
+    btn.innerText = '⤢';
+    btn.addEventListener('click', () => {
+      const canvas = box.querySelector('canvas');
+      if (!canvas) return;
+      try {
+        const url = canvas.toDataURL('image/png');
+        const img = document.getElementById('chartModalImg');
+        img.src = url;
+        document.getElementById('chartModal').classList.add('active');
+        document.getElementById('chartModal').setAttribute('aria-hidden', 'false');
+      } catch (e) { /* ignore */ }
+    });
+    box.style.position = 'relative';
+    box.appendChild(btn);
+  });
+
+  document.getElementById('chartModalClose').addEventListener('click', () => {
+    document.getElementById('chartModal').classList.remove('active');
+    document.getElementById('chartModal').setAttribute('aria-hidden', 'true');
+  });
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initChartExpand);
+else initChartExpand();
+
+function updateHeatmap() {
+  // Optional: support drawing heatmap for a custom data source or month
+  const args = Array.from(arguments);
+  const source = args[0] || filteredData;
+
+  // Apply month selector if present
+  const monthSel = $("monthSelector")?.value || 'ALL';
+  const dataSource = (monthSel && monthSel !== 'ALL')
+    ? source.filter((r) => {
+        const d = parseExcelDate(r['Created On']);
+        if (!d) return false;
+        const [y, m] = monthSel.split('-').map(Number);
+        return d.getFullYear() === y && d.getMonth() === (m - 1);
+      })
+    : source;
+
+  heatmapMatrix = Array.from({ length: 7 }, () => Array(24).fill(0));
+  dataSource.forEach((r) => {
+    const d = parseExcelDate(r["Created On"]);
+    if (!d) return;
+    const day = d.getDay(); // 0–6
+    const hour = d.getHours(); // 0–23
+    heatmapMatrix[day][hour]++;
+  });
+
+  const container = $("heatmapContainer");
+  if (container) container.style.display = "block";
+  container.innerHTML = "";
+
+  const max = Math.max(...heatmapMatrix.flat());
+
+  // Show Monday..Sunday order (map JS getDay 0=Sun..6=Sat -> order [1..6,0])
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const order = [1, 2, 3, 4, 5, 6, 0];
+
+  let html = "<table style='width:100%; border-collapse:collapse; text-align:center;'>";
+
+  /* Header row */
+  html += "<tr><th></th>";
+  for (let h = 0; h < 24; h++) html += `<th>${h}</th>`;
+  html += "</tr>";
+
+  /* Rows (Monday first) */
+  for (let i = 0; i < 7; i++) {
+    const d = order[i];
+    html += `<tr><th>${days[i]}</th>`;
+
+    for (let h = 0; h < 24; h++) {
+      const value = heatmapMatrix[d][h];
+      const ratio = max === 0 ? 0 : value / max;
+      const scaled = Math.sqrt(ratio);
+      const alpha = Math.min(1, 0.12 + 0.88 * scaled);
+      const color = `rgba(31,138,192, ${alpha})`;
+      const textColor = alpha < 0.28 ? getComputedStyle(document.documentElement).getPropertyValue('--text') : 'white';
+
+      html += `
+                <td style="
+                    padding:6px 8px;
+                    background:${color};
+                    color:${textColor};
+                    font-size:12px;
+                    border:1px solid rgba(0,0,0,0.06);
+                ">
+                    ${value}
+                </td>
+            `;
+    }
+
+    html += "</tr>";
+  }
+
+  html += "</table>";
+  container.innerHTML = html;
+}
+
+/* ============================================================= */
+/* TABLE */
+/* ============================================================= */
+
+let tablePage = 1;
+let ROWS_PER_PAGE = 20;
+
+$("tableSearch").addEventListener("input", updateTable);
+
+function updateTable() {
+  const search = $("tableSearch").value.toLowerCase();
+
+  const rows = filteredData.filter((r) =>
+    JSON.stringify(r).toLowerCase().includes(search),
+  );
+
+  renderTable(rows);
+}
+
+function renderTable(rows) {
+  const head = $("casesTableHead");
+  const body = $("casesTableBody");
+  const pag = $("tablePagination");
+
+  head.innerHTML = "";
+  body.innerHTML = "";
+  pag.innerHTML = "";
+
+  if (!rows.length) return;
+
+  /* Create table header */
+  const cols = Object.keys(rows[0]);
+  head.innerHTML = "<tr>" + cols.map((c) => `<th>${c}</th>`).join("") + "</tr>";
+
+  /* Pagination */
+  const totalPages = Math.ceil(rows.length / ROWS_PER_PAGE);
+  if (tablePage > totalPages) tablePage = totalPages;
+
+  const start = (tablePage - 1) * ROWS_PER_PAGE;
+  const slice = rows.slice(start, start + ROWS_PER_PAGE);
+
+  /* Populate body */
+  slice.forEach((r) => {
+    const row =
+      "<tr>" +
+      cols
+        .map((c) => {
+          const v = r[c];
+          if (v === null || v === undefined) return `<td></td>`;
+          const s = String(v);
+          // numeric-ish values: plain digits, optional decimal point
+          if (/^[+-]?\d+(?:\.\d+)?$/.test(s)) {
+            return `<td>${formatNumber(Number(s))}</td>`;
+          }
+          // otherwise escape HTML
+          const safe = s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          return `<td>${safe}</td>`;
+        })
+        .join("") +
+      "</tr>";
+    body.innerHTML += row;
+  });
+
+  /* Page buttons */
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement("button");
+    btn.textContent = p;
+    btn.className = "page-btn";
+
+    if (p === tablePage) {
+      btn.style.opacity = "0.7";
+    }
+
+    btn.onclick = () => {
+      tablePage = p;
+      renderTable(rows);
+    };
+
+    pag.appendChild(btn);
+  }
+}
+
+/* ============================================================= */
+/* TABLE EXPORT (CSV + PDF) */
+/* ============================================================= */
+
+$("exportTableCsv").onclick = () => {
+  let csv = "";
+
+  filteredData.forEach((r) => {
+    csv +=
+      Object.values(r)
+        .map((v) => {
+          if (v === null || v === undefined) return '""';
+          const num = Number(v);
+          if (isFinite(num)) return '"' + formatNumber(num) + '"';
+          return '"' + String(v).replace(/"/g, '""') + '"';
+        })
+        .join(",") + "\n";
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "CSC_tabla.csv";
+  a.click();
+};
+
+$("exportTablePdf").onclick = async () => {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape" });
+  pdf.text("Exportación de Tabla de Casos CSC", 10, 10);
+
+  // Build a temporary table with all filtered rows formatted according to settings
+  const tmp = document.createElement('div');
+  tmp.style.padding = '12px';
+
+  if (!filteredData.length) {
+    alert('No hay datos para exportar.');
+    return;
+  }
+
+  const cols = Object.keys(filteredData[0]);
+  let html = '<table style="width:100%; border-collapse:collapse;">';
+  html += '<thead><tr>' + cols.map(c => `<th style="padding:8px;border:1px solid #ddd;background:#f5f5f5">${c}</th>`).join('') + '</tr></thead>';
+  html += '<tbody>';
+
+  filteredData.forEach(r => {
+    html += '<tr>' + cols.map(c => {
+      const v = r[c];
+      if (v === null || v === undefined) return '<td style="padding:6px;border:1px solid #eee"></td>';
+      const s = String(v);
+      if (/^[+-]?\d+(?:\.\d+)?$/.test(s)) {
+        return `<td style="padding:6px;border:1px solid #eee">${formatNumber(Number(s))}</td>`;
+      }
+      const safe = s.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<td style="padding:6px;border:1px solid #eee">${safe}</td>`;
+    }).join('') + '</tr>';
+  });
+
+  html += '</tbody></table>';
+  tmp.innerHTML = html;
+  document.body.appendChild(tmp);
+
+  await pdf.html(tmp, {
+    callback: function () {
+      pdf.save('CSC_Tabla.pdf');
+      tmp.remove();
+    },
+    x: 10,
+    y: 20,
+  });
+};
+
+/* ============================================================= */
+/* COMPARE MODE */
+/* ============================================================= */
+
+$("compareRun").onclick = () => {
+  const Af = $("cmpAFrom").value;
+  const At = $("cmpATo").value;
+  const Bf = $("cmpBFrom").value;
+  const Bt = $("cmpBTo").value;
+
+  if (!Af || !At || !Bf || !Bt) {
+    alert("Please select all period dates.");
+    return;
+  }
+
+  const setA = filterByDate(rawData, Af, At);
+  const setB = filterByDate(rawData, Bf, Bt);
+
+  /* KPIs */
+  $("cmpTotalA").textContent = formatNumber(setA.length);
+  $("cmpTotalB").textContent = formatNumber(setB.length);
+  $("cmpDeltaTotal").textContent = formatNumber(setB.length - setA.length);
+
+  const sesA = setA.filter((r) =>
+    String(r["Queue"]).toUpperCase().includes("SES"),
+  ).length;
+  const sesB = setB.filter((r) =>
+    String(r["Queue"]).toUpperCase().includes("SES"),
+  ).length;
+
+  $("cmpSesA").textContent = formatNumber(sesA);
+  $("cmpSesB").textContent = formatNumber(sesB);
+  $("cmpDeltaSes").textContent = formatNumber(sesB - sesA);
+
+  /* DAILY COMPARISON CHART */
+  const dailyA = dailyCount(setA);
+  const dailyB = dailyCount(setB);
+
+  const labels = Array.from(
+    new Set([...Object.keys(dailyA), ...Object.keys(dailyB)]),
+  ).sort();
+
+  const valuesA = labels.map((k) => dailyA[k] || 0);
+  const valuesB = labels.map((k) => dailyB[k] || 0);
+
+  charts.compareDaily?.destroy();
+
+  charts.compareDaily = new Chart($("chartCompareDaily"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Period A",
+          data: valuesA,
+          borderColor: "#1f8ac0",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.25,
+        },
+        {
+          label: "Period B",
+          data: valuesB,
+          borderColor: "#4db27a",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.25,
+        },
+      ],
+    },
+  });
+};
+
+/* ============================================================= */
+/* SUPPORT FUNCTIONS */
+/* ============================================================= */
+
+function filterByDate(data, from, to) {
+  const f = new Date(from);
+  const t = new Date(to + "T23:59:59");
+
+  return data.filter((r) => {
+    const d = parseExcelDate(r["Created On"]);
+    return d && d >= f && d <= t;
+  });
+}
+
+function dailyCount(data) {
+  const out = {};
+
+  data.forEach((r) => {
+    const d = parseExcelDate(r["Created On"]);
+    if (!d) return;
+
+    const key = d.toISOString().split("T")[0];
+    out[key] = (out[key] || 0) + 1;
+  });
+
+  return out;
+}
+
+/* ============================================================= */
+/* EXPORT DASHBOARD AS PDF */
+/* ============================================================= */
+
+$("exportPdf").onclick = async () => {
+  const { jsPDF } = window.jspdf;
+
+  // Capture the entire dashboard view as a high-resolution image
+  const canvas = await html2canvas(document.body, { scale: 2 });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pageWidth = 210;
+  const pageHeight = 297;
+
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save("Panel_CSC.pdf");
+};
+
+/* ============================================================= */
+/* SETTINGS LOGIC */
+/* ============================================================= */
+
+// Cargar configuración guardada al iniciar
+function loadSettings() {
+  const saved = localStorage.getItem('cscSettings');
+  if (!saved) return;
+  
+  const settings = JSON.parse(saved);
+  
+  // Aplicar tema
+  if (settings.darkMode) {
+    document.body.classList.add('dark');
+    $('themeToggle').checked = true;
+  }
+  
+  // Aplicar otras configuraciones
+  if (settings.rowsPerPage) $('rowsPerPage').value = settings.rowsPerPage;
+  if (settings.dateFormat) $('dateFormat').value = settings.dateFormat;
+  if (settings.chartQuality) $('chartQuality').value = settings.chartQuality;
+  if (settings.contrastLevel) $('contrastLevel').value = settings.contrastLevel;
+  if (settings.thousandSeparator) $('thousandSeparator').value = settings.thousandSeparator;
+  
+  $('autoRefresh').checked = settings.autoRefresh || false;
+  $('saveFilters').checked = settings.saveFilters !== false;
+  $('showNotifications').checked = settings.showNotifications !== false;
+  $('showAnimations').checked = settings.showAnimations !== false;
+  $('showLegends').checked = settings.showLegends || false;
+  
+  // Aplicar color primario si existe
+  if (settings.primaryColor) {
+    document.documentElement.style.setProperty('--primary', settings.primaryColor);
+  }
+}
+
+// Guardar configuración
+function saveSettings() {
+  const settings = {
+    darkMode: document.body.classList.contains('dark'),
+    rowsPerPage: $('rowsPerPage').value,
+    dateFormat: $('dateFormat').value,
+    chartQuality: $('chartQuality').value,
+    contrastLevel: $('contrastLevel').value,
+    thousandSeparator: $('thousandSeparator') ? $('thousandSeparator').value : ',',
+    autoRefresh: $('autoRefresh').checked,
+    saveFilters: $('saveFilters').checked,
+    showNotifications: $('showNotifications').checked,
+    showAnimations: $('showAnimations').checked,
+    showLegends: $('showLegends').checked,
+    primaryColor: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()
+  };
+  
+  localStorage.setItem('cscSettings', JSON.stringify(settings));
+  
+  if ($('showNotifications').checked) {
+    showNotification('Configuración guardada correctamente', 'success');
+  }
+}
+
+// Notificaciones
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+    z-index: 1000;
+    max-width: 300px;
+  `;
+  
+  if (type === 'success') {
+    notification.style.backgroundColor = '#10b981';
+    notification.textContent = '✅ ' + message;
+  } else if (type === 'error') {
+    notification.style.backgroundColor = '#ef4444';
+    notification.textContent = '❌ ' + message;
+  } else {
+    notification.style.backgroundColor = '#3ba6d9';
+    notification.textContent = 'ℹ️ ' + message;
+  }
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Event listeners de configuración
+$('themeToggle').addEventListener('change', (e) => {
+  document.body.classList.toggle('dark');
+  saveSettings();
+});
+
+$('rowsPerPage').addEventListener('change', () => {
+  ROWS_PER_PAGE = parseInt($('rowsPerPage').value);
+  updateTable();
+  saveSettings();
+});
+
+$('dateFormat').addEventListener('change', saveSettings);
+$('chartQuality').addEventListener('change', saveSettings);
+$('contrastLevel').addEventListener('change', saveSettings);
+$('autoRefresh').addEventListener('change', saveSettings);
+$('saveFilters').addEventListener('change', saveSettings);
+$('showNotifications').addEventListener('change', saveSettings);
+if ($('thousandSeparator')) $('thousandSeparator').addEventListener('change', saveSettings);
+$('showAnimations').addEventListener('change', saveSettings);
+$('showLegends').addEventListener('change', saveSettings);
+
+// Cambio de color primario
+document.querySelectorAll('.color-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const color = btn.getAttribute('data-color');
+    document.documentElement.style.setProperty('--primary', color);
+    
+    // Actualizar borde del botón
+    document.querySelectorAll('.color-btn').forEach(b => {
+      b.style.borderColor = 'transparent';
+    });
+    btn.style.borderColor = color;
+    
+    saveSettings();
+    showNotification('Color actualizado', 'success');
+  });
+});
+
+// Botones de acciones
+$('resetFiltersBtn').addEventListener('click', () => {
+  $('filterDateFrom').value = '';
+  $('filterDateTo').value = '';
+  $('filterEquipment').value = 'ALL';
+  $('filterQueue').value = 'ALL';
+  $('filterHours').value = 'ALL';
+  $('filterHospital').value = 'ALL';
+  
+  applyFilters();
+  showNotification('Filtros restablecidos', 'success');
+});
+
+$('exportSettingsBtn').addEventListener('click', () => {
+  const settings = localStorage.getItem('cscSettings') || '{}';
+  const blob = new Blob([settings], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'csc-settings.json';
+  a.click();
+  showNotification('Configuración exportada', 'success');
+});
+
+$('importSettingsBtn').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const settings = JSON.parse(evt.target.result);
+        localStorage.setItem('cscSettings', JSON.stringify(settings));
+        loadSettings();
+        location.reload();
+      } catch (err) {
+        showNotification('Error al importar configuración', 'error');
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+});
+
+$('clearCacheBtn').addEventListener('click', () => {
+  if (confirm('¿Estás seguro de que deseas limpiar el caché?')) {
+    localStorage.clear();
+    sessionStorage.clear();
+    showNotification('Caché limpiado', 'success');
+    setTimeout(() => location.reload(), 1500);
+  }
+});
+
+$('checkUpdatesBtn').addEventListener('click', () => {
+  showNotification('Buscando actualizaciones...', 'info');
+  setTimeout(() => {
+    showNotification('Ya tienes la última versión (2.0.0)', 'success');
+  }, 1500);
+});
+
+// Actualizar información del sistema
+function updateSystemInfo() {
+  const sizeKB = (new Blob(Object.values(localStorage)).size / 1024);
+  $('cacheSize').textContent = formatNumber(sizeKB, 2) + ' KB';
+  $('lastUpdate').textContent = new Date().toLocaleString('es-ES');
+  $('recordCount').textContent = formatNumber(filteredData.length) + ' registros';
+}
+
+// Cargar y guardar automáticamente
+loadSettings();
+setInterval(() => {
+  if ($('autoRefresh').checked && rawData.length > 0) {
+    updateSystemInfo();
+  }
+}, 5 * 60 * 1000);
+
+// Actualizar al cargar datos
+window.addEventListener('load', updateSystemInfo);
+
+/* ============================================================= */
+/* END OF SCRIPT */
+/* ============================================================= */
+
+console.log(
+  "%cPanel CSC Cargado Correctamente",
+  "color: #1f8ac0; font-size: 14px;",
+);
+function generateReport(filteredData) {
+  const total = filteredData.length;
+  const calls = total * 4;
+
+  const daysMap = {};
+  const weekdayMap = { Feiners: 0, "Cap de setmana": 0 };
+  const teamMap = {};
+  const queueMap = {};
+
+  filteredData.forEach((row) => {
+    const date = new Date(row.date);
+    const dateKey = date.toISOString().split("T")[0];
+
+    daysMap[dateKey] = (daysMap[dateKey] || 0) + 1;
+
+    const day = date.getDay();
+    if (day === 0 || day === 6) {
+      weekdayMap["Cap de setmana"]++;
+    } else {
+      weekdayMap["Feiners"]++;
+    }
+
+    teamMap[row.team] = (teamMap[row.team] || 0) + 1;
+    queueMap[row.queue] = (queueMap[row.queue] || 0) + 1;
+  });
+
+  const avg = total / Object.keys(daysMap).length;
+
+  const maxDay = Object.entries(daysMap).sort((a, b) => b[1] - a[1])[0];
+
+  document.getElementById("rTotal").textContent = formatNumber(total);
+  document.getElementById("rCalls").textContent = formatNumber(calls);
+  document.getElementById("rAvg").textContent = formatNumber(avg, 2);
+  document.getElementById("rMaxDay").textContent = maxDay
+    ? `${maxDay[0]} (${formatNumber(maxDay[1])})`
+    : "-";
+
+  document.getElementById("reportDate").textContent =
+    "Data de l'informe: " + new Date().toLocaleDateString();
+
+  buildTable("weekdayTable", weekdayMap, "Tipus de dia", "Casos");
+  buildTable("teamTable", teamMap, "Equip", "Casos");
+  buildTable("queueTable", queueMap, "Cua", "Casos");
+}
+
+function buildTable(id, data, col1, col2) {
+  const table = document.getElementById(id);
+  table.innerHTML = `<tr><th>${col1}</th><th>${col2}</th></tr>`;
+
+  Object.entries(data).forEach(([key, value]) => {
+    table.innerHTML += `<tr><td>${key}</td><td>${formatNumber(value)}</td></tr>`;
+  });
+}
+
+// ✅ EXPORTACIÓ REAL A PDF
+document.getElementById("exportReportPdf").addEventListener("click", () => {
+  const element = document.getElementById("reportContainer");
+
+  html2pdf()
+    .from(element)
+    .set({
+      margin: 10,
+      filename: "informe_casos.pdf",
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+    })
+    .save();
+});
+
+  </script>
+</body>
+</html>
